@@ -8,7 +8,7 @@ from calc import Calc
 
 class CalculatorTestCase(unittest.TestCase):
     def setUp(self):
-        self.calc = Calc
+        self.calc = Calc()
 
     #add
     
