@@ -9,7 +9,7 @@ def set_precision(func):
 
 class Calc:
     def __init__(self):
-        getcontext().prec = 10
+        pass
 
     @staticmethod
     @set_precision
