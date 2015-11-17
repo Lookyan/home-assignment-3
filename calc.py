@@ -29,21 +29,12 @@ def lookCalc(get_inp, act_inp):
     first = get_inp("enter first operand: ")
     second = get_inp("enter second operand: ")
     action = act_inp("your operation: ")
-    try:
-        res = interpretator(first, action, second)
-    except InvalidOperation:
-        print "invalid operation"
-        raise
-    except ValueError:
-        print "incorrect value"
-        raise
-    print "Result: " + str(res)
+    res = interpretator(first, action, second)
+    print_result(res)
     return res
 
 def interpretator(x, operation, y):
-    print "first operand: " + str(x)
-    print "operation: " + operation
-    print "second operand: " + str(y)
+    output(x, operation, y)
     if operation == 'root by':
         return root(Decimal(x), Decimal(int(y)))
     if operation == '+':
@@ -55,6 +46,14 @@ def interpretator(x, operation, y):
     if operation == '/':
         return div(Decimal(x), Decimal(y))
     raise InvalidOperation
+
+def output(first, operation, second):
+    print "first operand: " + str(first)
+    print "operation: " + operation
+    print "second operand: " + str(second)
+
+def print_result(result):
+    print "Result: " + str(result)
 
 def root(x, y):
     getcontext().prec = PRECISION
@@ -83,14 +82,6 @@ def mult(x, y):
 
 def div(x, y):
     getcontext().prec = PRECISION
-    try:
-        res = float(x / y)
-    except ZeroDivisionError:
-        print "Can't divide by zero"
-        raise
-    except InvalidOperation:
-        print "Invalid format of operand"
-        raise
-
+    res = float(x / y)
     return res
 
