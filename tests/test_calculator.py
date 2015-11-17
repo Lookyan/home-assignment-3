@@ -3,91 +3,121 @@
 import unittest
 import sys
 sys.path.append("..")
-from calc import Calc
+from calc import *
+from decimal import InvalidOperation
 
 
 class CalculatorTestCase(unittest.TestCase):
-    def setUp(self):
-        self.calc = Calc()
 
-    #add
-    
-    def test_add_integer(self):
-        self.assertEqual(self.calc.add(20, 10), 30)
+    #test input and exceptions
 
-    def test_add_float(self):
-        self.assertEqual(self.calc.add(3.5, 2.7), 6.2)
+    def test_right_input(self):
+        self.assertEqual(lookCalc(lambda mess: 2.0, lambda mess: '+'), 4)  # test 2+2 via input fake
 
-    def test_add_swap_operands(self):
-        self.assertEqual(self.calc.add(2.7, 3.5), 6.2)
+    def test_bad_action_input(self):
+        self.assertRaises(InvalidOperation, lookCalc, lambda mess: 2.0, lambda mess: '^')  # 2.0 ^ 2.0 which is not supported
 
-    def test_add_negative_and_positive(self):
-        self.assertEqual(self.calc.add(-2.7, 3), 0.3)
+    def test_bad_operand_input(self):
+        self.assertRaises(InvalidOperation, lookCalc, lambda mess: '12s', lambda mess: '+')  # bad operand
 
-    def test_add_negative_operands(self):
-        self.assertEqual(self.calc.add(-0.3, -4.2), -4.5)
+    def test_zero_div_from_input(self):
+        self.assertRaises(InvalidOperation, lookCalc, lambda mess: 0, lambda mess: '/')  # / 0 via input
 
-    #sub
-        
-    def test_sub_integer(self):
-        self.assertEqual(self.calc.sub(20, 10), 10)
+    def test_bad_root(self):
+        self.assertRaises(ValueError, lookCalc, lambda mess: '0', lambda mess: 'root by')
 
-    def test_sub_float(self):
-        self.assertEqual(self.calc.sub(3.5, 2.7), 0.8)
+    def test_str_input(self):
+        self.assertEqual(lookCalc(lambda mess: '15', lambda mess: '+'), 30)
 
-    def test_sub_swap_operands(self):
-        self.assertEqual(self.calc.sub(2.7, 3.5), -0.8)
 
-    def test_sub_negative_and_positive(self):
-        self.assertEqual(self.calc.sub(-2.7, 3), -5.7)
+    #some direct tests
 
-    def test_sub_negative_operands(self):
-        self.assertEqual(self.calc.sub(-0.3, -4.2), 3.9)
+    def test_zero_div_direct(self):
+        self.assertRaises(ZeroDivisionError, div, 5, 0)
 
-    #mul
+    def test_invalid_root(self):
+        self.assertRaises(ValueError, root, -25, 4)
 
-    def test_mul_integer(self):
-        self.assertEqual(self.calc.mul(20, 10), 200)
+    def test_complex_sqrt(self):
+        self.assertEqual(root(-4, 2), Complex(1, 2))
 
-    def test_mul_float(self):
-        self.assertEqual(self.calc.mul(3.5, 2.7), 9.45)
 
-    def test_mul_swap_operands(self):
-        self.assertEqual(self.calc.mul(2.7, 3.5), 9.45)
+    #test operations directly through interpretator
 
-    def test_mul_negative_and_positive(self):
-        self.assertEqual(self.calc.mul(-2.7, 3), -8.1)
+    def test_right_root(self):
+        self.assertEqual(interpretator(4, "root by", 2), 2)
 
-    def test_mul_negative_operands(self):
-        self.assertEqual(self.calc.mul(-0.3, -4.2), 1.26)
+    def test_rigth_float_root(self):
+        self.assertEqual(interpretator(4.0, "root by", 2.0), 2.0)
 
-    #div
+    def test_right_real_float_root(self):
+        self.assertEqual(interpretator(0.25, "root by", 2), 0.5)
 
-    def test_div_integer(self):
-        self.assertEqual(self.calc.div(20, 10), 2)
+    def test_root_neg_with_odd_pow(self):
+        self.assertEqual(interpretator(-27, "root by", 3), -3)
 
-    def test_div_float(self):
-        self.assertEqual(self.calc.div(7.22, 0.1), 72.2)
+    def test_precision_of_root(self):
+        self.assertEqual(interpretator(15, "root by", 3), 2.46621207433)
 
-    def test_div_negative_and_positive(self):
-        self.assertEqual(self.calc.div(-8.88, 0.1), -88.8)
+    def test_add_right_operands(self):
+        self.assertEqual(interpretator(1, "+", 1), 2)
 
-    def test_div_negative_operands(self):
-        self.assertEqual(self.calc.div(-8.65, -0.01), 865)
+    def test_add_right_real_numbers(self):
+        self.assertEqual(interpretator(1.2, "+", 2.3), 3.5)
 
-    def test_zero_division(self):
-        self.assertRaises(ZeroDivisionError, self.calc.div, 5, 0)
+    def test_add_with_negative(self):
+        self.assertEqual(interpretator(2.0, "+", -1.1), 0.9)
 
-    #root
+    def test_add_str_interpretation(self):
+        self.assertEqual(interpretator('3.7', '+', '1.2'), 4.9)
 
-    def test_root_integer(self):
-        self.assertEqual(self.calc.root(4, 2), 2)
+    def test_sub_right(self):
+        self.assertEqual(interpretator(4, '-', 2), 2)
 
-    def test_root_float(self):
-        self.assertEqual(self.calc.root(0.25, 2), 0.5)
+    def test_sub_with_negative(self):
+        self.assertEqual(interpretator(1, '-', -1), 2)
 
-    def test_zero_root(self):
-        self.assertRaises(ValueError, self.calc.root, 10, 0)
+    def test_sub_negative_result(self):
+        self.assertEqual(interpretator(10, '-', 20), -10)
 
-    def test_root_negative(self):
-        self.assertRaises(ValueError, self.calc.root, -27, 3)
+    def test_sub_real_numbers(self):
+        self.assertEqual(interpretator(1.9, '-', 0.5), 1.4)
+
+    def test_sub_real_to_negative(self):
+        self.assertEqual(interpretator(2.3, '-', 3.0), -0.7)
+
+    def test_sub_from_zero(self):
+        self.assertEqual(interpretator(0, '-', 5), -5)
+
+    def test_sub_with_str(self):
+        self.assertEqual(interpretator('4', '-', '2'), 2)
+
+    def test_sub_from_negative_to_posit(self):
+        self.assertEqual(interpretator(-5, '-', -10), 5)
+
+    def test_mult_right(self):
+        self.assertEqual(interpretator(2, '*', 2), 4)
+
+    def test_mult_with_neg(self):
+        self.assertEqual(interpretator(2, '*', -3), -6)
+
+    def test_mult_real_numbers(self):
+        self.assertEqual(interpretator(2.5, '*', 2.0), 5)
+
+    def test_mult_neg_real(self):
+        self.assertEqual(interpretator(-2.5, '*', 2.0), -5)
+
+    def test_mult_with_str(self):
+        self.assertEqual(interpretator('1.2', '*', '2'), 2.4)
+
+    def test_div_right(self):
+        self.assertEqual(interpretator(4, '/', 2), 2)
+
+    def test_div_real_numbers(self):
+        self.assertEqual(interpretator(3.2, '/', 0.5), 6.4)
+
+    def test_div_neg(self):
+        self.assertEqual(interpretator(-5, '/', 2), -2.5)
+
+    def test_div_str(self):
+        self.assertEqual(interpretator('12', '/', '2.0'), 6)
