@@ -1,39 +1,56 @@
 import math
-from decimal import *
+from decimal import Decimal, getcontext, InvalidOperation
 
-def set_precision(func):
-        def nfunc(*args):
-            getcontext().prec = 10
-            return float(func(*args))
-        return nfunc
+PRECISION = 12
 
-class Calc:
-    def __init__(self):
-        pass
+def calc():
+    first = float(raw_input("enter first operand: "))
+    second = float(raw_input("enter second operand: "))
+    action = raw_input("your operation: ")
+    print interpretator(first, action, second)
 
-    @staticmethod
-    @set_precision
-    def add(x, y):
-        return Decimal(x) + Decimal(y)
+def interpretator(x, operation, y):
+    print "first operand: " + x
+    print "operation: " + operation
+    print "second operand: " + y
+    if operation == 'root by':
+        return root(x, y)
+    if operation == '+':
+        return add(x, y)
+    if operation == '-':
+        return sub(x, y)
+    if operation == '*':
+        return mult(x, y)
+    if operation == '/':
+        return div(x, y)
 
-    @staticmethod
-    @set_precision
-    def sub(x, y):
-        return Decimal(x) - Decimal(y)
+def root(x, y):
+    getcontext().prec = PRECISION
+    if y < 1 or x < 0:
+        raise ValueError
+    return float(Decimal(x) ** (Decimal(1) / Decimal(int(y))))
 
-    @staticmethod
-    @set_precision
-    def mul(x, y):
-        return Decimal(x) * Decimal(y)
+def add(x, y):
+    getcontext().prec = PRECISION
+    return float(Decimal(x) + Decimal(y))
 
-    @staticmethod
-    @set_precision
-    def div(x, y):
-        return Decimal(x) / Decimal(y)
+def sub(x, y):
+    getcontext().prec = PRECISION
+    return float(Decimal(x) - Decimal(y))
 
-    @staticmethod
-    @set_precision
-    def root(x, y):
-        if y < 1 or x < 0:
-            raise ValueError
-        return Decimal(x) ** (Decimal(1) / Decimal(int(y)))
+def mult(x, y):
+    getcontext().prec = PRECISION
+    return float(Decimal(x) * Decimal(y))
+
+def div(x, y):
+    getcontext().prec = PRECISION
+    try:
+        res = float(Decimal(x) / Decimal(y))
+    except ZeroDivisionError:
+        print "Can't divide by zero"
+        raise
+    except InvalidOperation:
+        print "Invalid format of operand"
+        raise
+
+    return res
