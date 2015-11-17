@@ -3,49 +3,88 @@ from decimal import Decimal, getcontext, InvalidOperation
 
 PRECISION = 12
 
-def calc():
-    first = float(raw_input("enter first operand: "))
-    second = float(raw_input("enter second operand: "))
-    action = raw_input("your operation: ")
-    print interpretator(first, action, second)
+def start():
+    lookCalc(input_func, action_input)
+
+def input_func(message):
+    return float(raw_input(message))
+
+def action_input(message):
+    return str(raw_input(message))
+
+class Complex():
+    def __init__(self, im, real):
+        self.im = im
+        self.real = real
+
+    def __str__(self):
+        return "Complex(" + str(self.real) + ", " + str(self.im) + ")"
+
+    def __eq__(self, other):
+        if isinstance(other, Complex):
+            return self.im == other.im and self.real == other.real
+        return NotImplemented
+
+def lookCalc(get_inp, act_inp):
+    first = get_inp("enter first operand: ")
+    second = get_inp("enter second operand: ")
+    action = act_inp("your operation: ")
+    try:
+        res = interpretator(first, action, second)
+    except InvalidOperation:
+        print "invalid operation"
+        raise
+    except ValueError:
+        print "incorrect value"
+        raise
+    print "Result: " + str(res)
+    return res
 
 def interpretator(x, operation, y):
-    print "first operand: " + x
+    print "first operand: " + str(x)
     print "operation: " + operation
-    print "second operand: " + y
+    print "second operand: " + str(y)
     if operation == 'root by':
-        return root(x, y)
+        return root(Decimal(x), Decimal(int(y)))
     if operation == '+':
-        return add(x, y)
+        return add(Decimal(x), Decimal(y))
     if operation == '-':
-        return sub(x, y)
+        return sub(Decimal(x), Decimal(y))
     if operation == '*':
-        return mult(x, y)
+        return mult(Decimal(x), Decimal(y))
     if operation == '/':
-        return div(x, y)
+        return div(Decimal(x), Decimal(y))
+    raise InvalidOperation
 
 def root(x, y):
     getcontext().prec = PRECISION
-    if y < 1 or x < 0:
+    if y < 1:
         raise ValueError
-    return float(Decimal(x) ** (Decimal(1) / Decimal(int(y))))
+    if x < 0 and y % 2 != 0:
+        return (-1) * float(abs(x) ** (Decimal(1) / y))
+    elif x < 0 and y == 2:
+        return Complex(1, float(abs(x) ** (Decimal(1) / y)))
+    elif x < 0:
+        raise ValueError
+    else:
+        return float(x ** (Decimal(1) / y))
 
 def add(x, y):
     getcontext().prec = PRECISION
-    return float(Decimal(x) + Decimal(y))
+    return float(x + y)
 
 def sub(x, y):
     getcontext().prec = PRECISION
-    return float(Decimal(x) - Decimal(y))
+    return float(x - y)
 
 def mult(x, y):
     getcontext().prec = PRECISION
-    return float(Decimal(x) * Decimal(y))
+    return float(x * y)
 
 def div(x, y):
     getcontext().prec = PRECISION
     try:
-        res = float(Decimal(x) / Decimal(y))
+        res = float(x / y)
     except ZeroDivisionError:
         print "Can't divide by zero"
         raise
@@ -54,3 +93,4 @@ def div(x, y):
         raise
 
     return res
+
