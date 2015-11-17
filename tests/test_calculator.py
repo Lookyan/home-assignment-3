@@ -3,7 +3,7 @@
 import unittest
 import sys
 sys.path.append("..")
-from calc import *
+from calc import lookCalc, interpretator, Complex, div, root
 from decimal import InvalidOperation
 
 
