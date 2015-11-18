@@ -13,16 +13,13 @@ class Complex():
         return "Complex(" + str(self.real) + ", " + str(self.im) + ")"
 
     def __eq__(self, other):
-        if isinstance(other, Complex):
-            return self.im == other.im and self.real == other.real
-        return NotImplemented
+        return self.im == other.im and self.real == other.real
 
 def start():
     first = float(raw_input("enter first operand: "))
     second = float(raw_input("enter second operand: "))
     action = str(raw_input("your operation: "))
-    res = interpretator(first, action, second)
-    print "Result: " + str(result)
+    print str(interpretator(first, action, second))
 
 def interpretator(x, operation, y):
     if operation == 'root by':
