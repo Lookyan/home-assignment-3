@@ -38,6 +38,9 @@ class CalculatorTestCase(unittest.TestCase):
     def test_invalid_root(self):
         self.assertRaises(ValueError, root, -25, 4)
 
+    def test_float_root(self):
+        self.assertRaises(ValueError, root, 4, 2.12)
+
     def test_complex_sqrt(self):
         self.assertEqual(root(-4, 2), Complex(1, 2))
 
