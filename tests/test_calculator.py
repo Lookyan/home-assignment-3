@@ -3,32 +3,11 @@
 import unittest
 import sys
 sys.path.append("..")
-from calc import lookCalc, interpretator, Complex, div, root
+from calc import interpretator, Complex, div, root
 from decimal import InvalidOperation
 
 
 class CalculatorTestCase(unittest.TestCase):
-
-    #test input and exceptions
-
-    def test_right_input(self):
-        self.assertEqual(lookCalc(lambda mess: 2.0, lambda mess: '+'), 4)  # test 2+2 via input fake
-
-    def test_bad_action_input(self):
-        self.assertRaises(InvalidOperation, lookCalc, lambda mess: 2.0, lambda mess: '^')  # 2.0 ^ 2.0 which is not supported
-
-    def test_bad_operand_input(self):
-        self.assertRaises(InvalidOperation, lookCalc, lambda mess: '12s', lambda mess: '+')  # bad operand
-
-    def test_zero_div_from_input(self):
-        self.assertRaises(InvalidOperation, lookCalc, lambda mess: 0, lambda mess: '/')  # / 0 via input
-
-    def test_bad_root(self):
-        self.assertRaises(ValueError, lookCalc, lambda mess: '0', lambda mess: 'root by')
-
-    def test_str_input(self):
-        self.assertEqual(lookCalc(lambda mess: '15', lambda mess: '+'), 30)
-
 
     #some direct tests
 
@@ -62,6 +41,15 @@ class CalculatorTestCase(unittest.TestCase):
     def test_precision_of_root(self):
         self.assertEqual(interpretator(15, "root by", 3), 2.46621207433)
 
+    def test_zero_root(self):
+        self.assertRaises(ValueError, interpretator, 16, "root by", 0)
+
+    def test_root_str_param(self):
+        self.assertEqual(interpretator('16', "root by", '2'), 4)
+
+    def test_root_bad_operand(self):
+        self.assertRaises(InvalidOperation, interpretator, '12s', "root by", 3)
+
     def test_add_right_operands(self):
         self.assertEqual(interpretator(1, "+", 1), 2)
 
@@ -73,6 +61,9 @@ class CalculatorTestCase(unittest.TestCase):
 
     def test_add_str_interpretation(self):
         self.assertEqual(interpretator('3.7', '+', '1.2'), 4.9)
+
+    def test_add_bad_operand(self):
+        self.assertRaises(InvalidOperation, interpretator, '1q', '+', 20)
 
     def test_sub_right(self):
         self.assertEqual(interpretator(4, '-', 2), 2)
@@ -98,6 +89,9 @@ class CalculatorTestCase(unittest.TestCase):
     def test_sub_from_negative_to_posit(self):
         self.assertEqual(interpretator(-5, '-', -10), 5)
 
+    def test_sub_bad_operand(self):
+        self.assertRaises(InvalidOperation, interpretator, 'test', '-', 20)
+
     def test_mult_right(self):
         self.assertEqual(interpretator(2, '*', 2), 4)
 
@@ -113,6 +107,9 @@ class CalculatorTestCase(unittest.TestCase):
     def test_mult_with_str(self):
         self.assertEqual(interpretator('1.2', '*', '2'), 2.4)
 
+    def test_mult_bad_operand(self):
+        self.assertRaises(InvalidOperation, interpretator, '3q1', '*', 1)
+
     def test_div_right(self):
         self.assertEqual(interpretator(4, '/', 2), 2)
 
@@ -124,3 +121,9 @@ class CalculatorTestCase(unittest.TestCase):
 
     def test_div_str(self):
         self.assertEqual(interpretator('12', '/', '2.0'), 6)
+
+    def test_div_bad_operand(self):
+        self.assertRaises(InvalidOperation, interpretator, 'q', '/', 20)
+
+    def test_bad_operation(self):
+        self.assertRaises(InvalidOperation, interpretator, 1, '^', 2)
