@@ -34,9 +34,8 @@ def lookCalc(get_inp, act_inp):
     return res
 
 def interpretator(x, operation, y):
-    output(x, operation, y)
     if operation == 'root by':
-        return root(Decimal(x), Decimal(int(y)))
+        return root(Decimal(x), Decimal(y))
     if operation == '+':
         return add(Decimal(x), Decimal(y))
     if operation == '-':
@@ -47,16 +46,15 @@ def interpretator(x, operation, y):
         return div(Decimal(x), Decimal(y))
     raise InvalidOperation
 
-def output(first, operation, second):
-    print "first operand: " + str(first)
-    print "operation: " + operation
-    print "second operand: " + str(second)
 
 def print_result(result):
     print "Result: " + str(result)
 
+
 def root(x, y):
     getcontext().prec = PRECISION
+    if float(y).is_integer() != True:
+        raise ValueError
     if y < 1:
         raise ValueError
     if x < 0 and y % 2 != 0:
@@ -67,6 +65,7 @@ def root(x, y):
         raise ValueError
     else:
         return float(x ** (Decimal(1) / y))
+
 
 def add(x, y):
     getcontext().prec = PRECISION
