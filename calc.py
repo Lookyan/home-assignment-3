@@ -3,14 +3,6 @@ from decimal import Decimal, getcontext, InvalidOperation
 
 PRECISION = 12
 
-def start():
-    lookCalc(input_func, action_input)
-
-def input_func(message):
-    return float(raw_input(message))
-
-def action_input(message):
-    return str(raw_input(message))
 
 class Complex():
     def __init__(self, im, real):
@@ -25,13 +17,12 @@ class Complex():
             return self.im == other.im and self.real == other.real
         return NotImplemented
 
-def lookCalc(get_inp, act_inp):
-    first = get_inp("enter first operand: ")
-    second = get_inp("enter second operand: ")
-    action = act_inp("your operation: ")
+def start():
+    first = float(raw_input("enter first operand: "))
+    second = float(raw_input("enter second operand: "))
+    action = str(raw_input("your operation: "))
     res = interpretator(first, action, second)
-    print_result(res)
-    return res
+    print "Result: " + str(result)
 
 def interpretator(x, operation, y):
     if operation == 'root by':
@@ -45,10 +36,6 @@ def interpretator(x, operation, y):
     if operation == '/':
         return div(Decimal(x), Decimal(y))
     raise InvalidOperation
-
-
-def print_result(result):
-    print "Result: " + str(result)
 
 
 def root(x, y):
